@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    html = f"<h2Hello World, my name is Thiruvarasamoorthy Viswanathan</h2>"
+    html = f"<h2>Hello World, my name is Thiruvarasamoorthy Viswanathan</h2>"
     return html.format(format)
 
 if __name__ == "__main__":
