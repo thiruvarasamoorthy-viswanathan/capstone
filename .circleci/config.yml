@@ -79,6 +79,7 @@ workflows:
     jobs:
       - install-dependencies
       - build-docker:
+          context: docker-secrets
           filters:
             branches:
               only: [ main ]
