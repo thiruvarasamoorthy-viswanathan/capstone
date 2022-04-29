@@ -55,7 +55,7 @@ jobs:
             . venv/bin/activate
             make lint
 
-  docker-build:
+  docker-build-push:
     working_directory: /app
     docker:
       - image: docker:17.09.0-ce-git
@@ -74,12 +74,37 @@ jobs:
             docker image tag udacity-devops-capstone $DOCKERPATH:${CIRCLE_WORKFLOW_ID:0:7}
             docker image push $DOCKERPATH:${CIRCLE_WORKFLOW_ID:0:7}
 
+  deployment:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            install -m 0755 kubectl /bin/kubectl
+      - run:
+          name: Update Deployment
+          command: |
+            PROJECT=udacity-devops-capstone
+            IMAGE="vtm1983/udacity-devops-capstone"
+            aws eks --region us-east-1 update-kubeconfig --name Capstone-Cluster
+            aws sts get-caller-identity
+            kubectl apply -f kubernetes/deployment.yml
+            kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:${CIRCLE_WORKFLOW_ID:0:7}
+            kubectl get nodes
+            kubectl get pods
+
 workflows:
   default:
     jobs:
       - install-dependencies
       - lint:
           requires: [install-dependencies]    
-      - docker-build:
+      - docker-build-push:
           requires: [lint]
-          context: docker-secrets          
+          context: docker-secrets
+      - deployment:
+          requires: [docker-build-push]
+          context: docker-secrets   

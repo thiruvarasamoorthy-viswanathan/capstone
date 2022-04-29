@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: udacity-devops-capstone
+  labels:
+    app: udacity-devops-capstone
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: udacity-devops-capstone
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: udacity-devops-capstone
+    spec:
+      containers:
+        - image: vtm1983/udacity-devops-capstone:latest
+          name: udacity-devops-capstone
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: app-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udacity-devops-capstone
+  labels:
+    name: udacity-devops-capstone
+spec:
+  selector:
+    app: udacity-devops-capstone
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 80
+      protocol: TCP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: udacity-devops-capstone
+  namespace: kube-system
+  labels:
+    app: udacity-devops-capstone
+  annotations:
+    alb.ingress.kubernetes.io/target-type: instance
+
+
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: udacity-devops-capstone
+                port:
+                  number: 8000
