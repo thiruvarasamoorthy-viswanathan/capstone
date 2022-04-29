@@ -3,5 +3,5 @@
 PORT=8000
 echo "Port: $PORT"
 
-# POST method predict
+# CURL Application URL
 curl "http://localhost:$PORT/"
