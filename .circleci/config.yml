@@ -89,7 +89,7 @@ jobs:
           command: |
             PROJECT=udacity-devops-capstone
             IMAGE="vtm1983/udacity-devops-capstone"
-            aws eks --region us-east-1 update-kubeconfig --name udacity-devops
+            aws eks --region us-east-1 update-kubeconfig --name Capstone-Cluster
             
             aws eks update-kubeconfig \
                 --region us-east-1 \
