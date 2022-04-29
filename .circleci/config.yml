@@ -82,3 +82,4 @@ workflows:
           requires: [install-dependencies]    
       - docker-build:
           requires: [lint]
+          context: docker-secrets          
