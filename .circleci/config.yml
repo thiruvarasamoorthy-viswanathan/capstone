@@ -70,4 +70,5 @@ workflows:
           requires: [ linting ]
           filters:
             branches:
-              only: [ main ]                        
+              only: [ main ]
+                                  
