@@ -90,6 +90,7 @@ jobs:
             PROJECT=udacity-devops-capstone
             IMAGE="vtm1983/udacity-devops-capstone"
             aws eks --region us-east-1 update-kubeconfig --name Capstone-Cluster
+            aws sts get-caller-identity
             kubectl apply -f kubernetes/deployment.yml
             kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:${CIRCLE_WORKFLOW_ID:0:7}
             kubectl get nodes
