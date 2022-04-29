@@ -79,6 +79,6 @@ workflows:
     jobs:
       - install-dependencies
       - lint:
-          requires: [installing-dependencies]    
+          requires: [install-dependencies]    
       - docker-build:
           requires: [lint]
