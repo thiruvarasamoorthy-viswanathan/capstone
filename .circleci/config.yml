@@ -78,7 +78,7 @@ workflows:
   default:
     jobs:
       - install-dependencies
-      - build-docker
+      - build-docker:
           filters:
             branches:
               only: [ main ]
