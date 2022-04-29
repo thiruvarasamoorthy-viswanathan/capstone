@@ -78,10 +78,7 @@ workflows:
   default:
     jobs:
       - install-dependencies
-#      - linting:
-#          requires: [ install-dependencies ]
-      - build-docker #:
-#          requires: [ linting ]
+      - build-docker
           filters:
             branches:
               only: [ main ]
