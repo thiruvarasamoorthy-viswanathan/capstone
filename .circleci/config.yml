@@ -96,7 +96,7 @@ jobs:
                 --name Capstone-Cluster \
                 --role-arn arn:aws:iam::473230858255:role/Devops-Capstone-Project-EKSIAMRole-106U2OL333TQH     
             kubectl get svc                 
-            kubectl config use-context arn:aws:iam::473230858255:role/Devops-Capstone-Project-EKSIAMRole-106U2OL333TQH
+           # kubectl config use-context arn:aws:iam::473230858255:role/Devops-Capstone-Project-EKSIAMRole-106U2OL333TQH
             kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:${CIRCLE_WORKFLOW_ID:0:7}
             kubectl apply -f deployment.yml
             kubectl get nodes
