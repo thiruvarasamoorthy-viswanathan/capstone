@@ -127,4 +127,5 @@ workflows:
   default:
     jobs:
       - deploy
+          context: aws-cred 
  
