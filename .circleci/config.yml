@@ -121,10 +121,10 @@ jobs:
             aws eks update-kubeconfig --name Capstone-Cluster --region us-east-1 
             aws eks update-kubeconfig --name Capstone-Cluster --region us-east-1 --role-arn arn:aws:iam::473230858255:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKS
             kubectl config view --minify
-            kubectl get svc
-            
-            kubectl apply -f kubernetes/deployment.yml
-            kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:${CIRCLE_WORKFLOW_ID:0:7}
+            kubectl get svc 
+
+            kubectl apply -f kubernetes/deployment.yml --v=5
+            kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:${CIRCLE_WORKFLOW_ID:0:7} --v=5
             kubectl get nodes
             kubectl get pods            
 
