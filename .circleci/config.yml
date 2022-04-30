@@ -101,7 +101,7 @@ jobs:
             docker image tag udacity-devops-capstone $DOCKERPATH:${CIRCLE_WORKFLOW_ID:0:7}
             docker image push $DOCKERPATH:${CIRCLE_WORKFLOW_ID:0:7}
 
-  deployment:
+  deploy:
     docker:
       - image: amazon/aws-cli
     steps:
@@ -117,17 +117,14 @@ jobs:
             PROJECT=udacity-devops-capstone
             IMAGE="vtm1983/udacity-devops-capstone"
             aws eks --region us-east-1 update-kubeconfig --name Capstone-Cluster
-   
-            kubectl get svc                 
+            aws sts get-caller-identity
+            kubectl apply -f kubernetes/deployment.yml
             kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:${CIRCLE_WORKFLOW_ID:0:7}
-            kubectl apply -f deployment.yml
             kubectl get nodes
-            kubectl get deployment
-            kubectl get pod -o wide
-            kubectl get service/udacity-devops-capstone
+            kubectl get pods            
 
 workflows:
   default:
     jobs:
-      - EKS-cluster-infra
+      - deploy
  
