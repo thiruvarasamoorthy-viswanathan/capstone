@@ -164,7 +164,7 @@ jobs:
       - run:
           name: pull image from repo
           command: |
-            docker login -u vtm1983 -p "$DOCKERHUB_PASSWORD"
+            docker login -u vtm1983 -p "$DOCKER_PASSWORD"
             docker pull vtm1983/udacity-devops-capstone
             echo "<-- IMAGE PULLED! --> "
       - run:
