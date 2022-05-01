@@ -4,36 +4,51 @@ orbs:
   kubernetes: circleci/kubernetes@0.4.0 
   aws-eks: circleci/aws-eks@1.1.0
 
+
+commands: 
+  linux-install-aws:
+    description: installs awscli v2 using pip
+    steps:
+      - run: 
+          name: install aws cli
+          command: |
+            
+            if (aws --version)
+            then 
+              export AWSV=$(aws --version | cut -d/ -f2 | cut -d. -f1)
+              if  [ $(($AWSV>1)) ]
+              then
+                echo cli already installed
+              else
+                echo uninstalling old aws version now
+                sudo rm -rf /usr/local/aws
+                sudo rm /usr/local/bin/aws  
+                echo installing new version now
+                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                unzip awscliv2.zip
+                ./aws/install
+                aws --version
+            fi 
+            else  
+              echo installing new version now
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              ./aws/install
+              aws --version
+            fi
 jobs:
-  install-dependencies:
+  Lint:
+    
     docker:
-      - image: circleci/node:13.8.0
+      - image: python:3.7.3-stretch
+    
     steps:
       - checkout
-      - run:
-          name: app dependencies
-          working_directory: ./app
-          command: npm install
-      - save_cache:
-          paths: [app/node_modules]
-          key: build  
-
-  lint:
-      docker:
-      # Use the same Docker base as the project
-      - image: python:3.7.3-stretch
-      working_directory: ~/repo
-
-      steps:
-      - checkout
-
-      # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "requirements.txt" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
       - run:
           name: install dependencies
           command: |
@@ -43,19 +58,27 @@ jobs:
             # Install hadolint
             wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
             chmod +x /bin/hadolint
+            # Install pylint
+            pip install pylint
       - save_cache:
           paths:
-          - ./venv
+            - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
 
       # run lint!
       - run:
-          name: run lint
+          name: Docker lint
           command: |
             . venv/bin/activate
-            make lint
+            hadolint Dockerfile
+      - run:
+          name: pylint
+          command: |
+            . venv/bin/activate
+            pylint app.py --errors-only
 
-  EKS-cluster-infra:
+
+  Ekscluster-infrastructure:
     docker:
       - image: python:3.7.3-stretch
     working_directory: ~/repo
@@ -74,13 +97,42 @@ jobs:
           name:
           command: |
             eksctl create cluster \
-            --name green-$CIRCLE_WORKFLOW_ID \
+            --name prod-green-$CIRCLE_WORKFLOW_ID \
             --region us-east-1 \
             --nodegroup-name worker-node-$CIRCLE_WORKFLOW_ID \
             --node-type t3.micro \
             --nodes 2 \
             --nodes-min 1 \
             --nodes-max 2 
+
+
+  Kubectl:
+    docker:
+      - image: amazon/aws-cli
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - run:
+          name: aws iam auth
+          command: |
+              curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.21.2/2021-07-05/bin/linux/amd64/aws-iam-authenticator
+              chmod +x ./aws-iam-authenticator
+              mkdir -p $HOME/bin && cp ./aws-iam-authenticator $HOME/bin/aws-iam-authenticator && export PATH=$PATH:$HOME/bin
+      - run:
+          name: kubectl login
+          command: |
+              curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.21.2/2021-07-05/bin/linux/amd64/kubectl
+              chmod +x ./kubectl
+              mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
+              aws eks --region us-west-2 update-kubeconfig --name production-$CIRCLE_WORKFLOW_ID
+              kubectl version --client
+              export KUBECONFIG=~/.kube/config
+              kubectl get svc
+              kubectl get nodes 
+  
+
+
 
   docker-build-push:
     working_directory: /app
@@ -101,74 +153,58 @@ jobs:
             docker image tag udacity-devops-capstone $DOCKERPATH:${CIRCLE_WORKFLOW_ID:0:7}
             docker image push $DOCKERPATH:${CIRCLE_WORKFLOW_ID:0:7}
 
-  deploy:
-    docker:
-      - image: amazon/aws-cli
+
+  deploy-EKS-cluster:
+    machine: 
+          image: ubuntu-2004:202111-01
+    working_directory: ~/repo
     steps:
       - checkout
+      - linux-install-aws
       - run:
-          name: Install dependencies
+          name: pull image from repo
           command: |
-            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-            install -m 0755 kubectl /bin/kubectl
+            docker login -u vtm1983 -p "$DOCKERHUB_PASSWORD"
+            docker pull vtm1983/udacity-devops-capstone
+            echo "<-- IMAGE PULLED! --> "
       - run:
-          name: Update Deployment
+          name: aws iam auth
           command: |
-            PROJECT=udacity-devops-capstone
-            IMAGE="vtm1983/udacity-devops-capstone"
-            cluster_name="Capstone-Cluster"
-            aws sts get-caller-identity
-            aws eks update-kubeconfig --name Capstone-Cluster --region us-east-1 
-            aws eks update-kubeconfig --name Capstone-Cluster --region us-east-1 --role-arn arn:aws:iam::473230858255:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKS
-          #!/bin/bash
-            read -r -d '' KUBECONFIG <<EOF
-            apiVersion: v1
-            clusters:
-            - cluster:
-                certificate-authority-data: $certificate_data
-                server: $cluster_endpoint
-              name: arn:aws:eks:$region_code:$account_id:cluster/$cluster_name
-            contexts:
-            - context:
-                cluster: arn:aws:eks:$region_code:$account_id:cluster/$cluster_name
-                user: arn:aws:eks:$region_code:$account_id:cluster/$cluster_name
-              name: arn:aws:eks:$region_code:$account_id:cluster/$cluster_name
-            current-context: arn:aws:eks:$region_code:$account_id:cluster/$cluster_name
-            kind: Config
-            preferences: {}
-            users:
-            - name: arn:aws:eks:$region_code:$account_id:cluster/$cluster_name
-              user:
-                exec:
-                  apiVersion: client.authentication.k8s.io/v1alpha1
-                  command: aws
-                  args:
-                    - --region
-                    - $region_code
-                    - eks
-                    - get-token
-                    - --cluster-name
-                    - $cluster_name
-                    # - "-r"
-                    # - "arn:aws:iam::$account_id:role/my-role"
-                  # env:
-                    # - name: "AWS_PROFILE"
-                    #   value: "aws-profile"
-            EOF
-            echo "${KUBECONFIG}" > ~/.kube/config            
-            
-            
-            kubectl config view --minify --v=5
-            kubectl get svc --v=5
-
-            kubectl apply -f kubernetes/deployment.yml --v=5
-            kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:${CIRCLE_WORKFLOW_ID:0:7} --v=5
+              curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.21.2/2021-07-05/bin/linux/amd64/aws-iam-authenticator
+              chmod +x ./aws-iam-authenticator
+              mkdir -p $HOME/bin && cp ./aws-iam-authenticator $HOME/bin/aws-iam-authenticator && export PATH=$PATH:$HOME/bin
+      - run:
+          name: deoploy cluster Green
+          command: |
+            curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.21.2/2021-07-05/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
+            aws eks --region us-west-2 update-kubeconfig --name prod-green-$CIRCLE_WORKFLOW_ID
+            kubectl version --client
+            export KUBECONFIG=~/.kube/config
+            kubectl apply -f eks/k8s-deploy.yml
+            echo "<-- CLUSTER DEPLOYED! --> "
+            kubectl apply -f eks/k8s-service.yml
+            echo "<-- Loadbalancer service --> "
+            kubectl get svc
+            echo "<-- CLUSTER DEPLOYED! --> "
+            echo "<-- CLUSTER NODES --> "
             kubectl get nodes
-            kubectl get pods            
+            echo "<-- CLUSTER PODS --> "
+            kubectl get pods --all-namespaces
+      - run:
+          name: Delete Blue deployment
+          command: |
+            curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/v0.83.0/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
+            sudo mv /tmp/eksctl /usr/local/bin
+            eksctl delete cluster --name prod-blue
 
 workflows:
-  default:
+  Default:
     jobs:
-      - deploy:
-          context: aws-cred 
- 
+      - Lint
+      - Ekscluster-infrastructure
+      - docker-build-push:
+          requires: [Ekscluster-infrastructure]
+      - deploy-EKS-cluster:
+          requires: [docker-build-push]
