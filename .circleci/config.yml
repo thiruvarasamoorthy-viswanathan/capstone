@@ -203,7 +203,7 @@ workflows:
   Default:
     jobs:
       - Lint
-      - Ekscluster-infrastructure
+      - Ekscluster-infrastructure:
           context: aws-cred 
       - docker-build-push:
           requires: [Ekscluster-infrastructure]
