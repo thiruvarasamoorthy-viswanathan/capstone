@@ -204,3 +204,4 @@ workflows:
     jobs:
       - deploy-EKS-cluster:
           context: docker-secrets
+          context: aws-cred
