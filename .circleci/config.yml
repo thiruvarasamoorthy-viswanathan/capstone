@@ -210,4 +210,4 @@ workflows:
           context: docker-secrets
       - deploy-EKS-cluster:
           requires: [docker-build-push]
-          context: aws-cred 
+          context: docker-secrets
