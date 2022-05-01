@@ -202,12 +202,5 @@ jobs:
 workflows:
   Default:
     jobs:
-      - Lint
-      - Ekscluster-infrastructure:
-          context: aws-cred 
-      - docker-build-push:
-          requires: [Ekscluster-infrastructure]
-          context: docker-secrets
       - deploy-EKS-cluster:
-          requires: [docker-build-push]
           context: docker-secrets
