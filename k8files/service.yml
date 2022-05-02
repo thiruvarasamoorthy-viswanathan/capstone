@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: capstone-project-service
+  name: udacity-devops-capstone-service
 spec:
   selector:
-    app: capstone-project
+    app: udacity-devops-capstone
   ports:
     - protocol: TCP
       port: 80
