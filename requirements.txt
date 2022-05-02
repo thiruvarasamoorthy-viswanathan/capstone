@@ -1,2 +1,9 @@
+pytest
 pylint
-Flask
+jupyter
+pytest-cov
+pandas
+nbval
+click
+flask
+requests

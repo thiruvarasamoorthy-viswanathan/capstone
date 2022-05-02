@@ -202,7 +202,10 @@ jobs:
 workflows:
   Default:
     jobs:
+      - docker-build-push:
+          context: docker-secrets    
       - deploy-EKS-cluster:
+          requires: [docker-build-push]
           context: 
             - docker-secrets
             - aws-cred
