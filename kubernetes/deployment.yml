@@ -42,28 +42,3 @@ spec:
       port: 8000
       targetPort: 80
       protocol: TCP
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: udacity-devops-capstone
-  namespace: kube-system
-  labels:
-    app: udacity-devops-capstone
-  annotations:
-    alb.ingress.kubernetes.io/target-type: instance
-
-
-spec:
-  ingressClassName: alb
-  rules:
-    - http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: udacity-devops-capstone
-                port:
-                  number: 8000
