@@ -26,7 +26,9 @@ spec:
           ports:
             - containerPort: 80
               name: app-server
+              
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -41,4 +43,4 @@ spec:
     - name: http
       port: 8000
       targetPort: 80
-      protocol: TCP
+      protocol: TCP  
