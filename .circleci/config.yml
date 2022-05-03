@@ -154,6 +154,20 @@ jobs:
             docker image push $DOCKERPATH:${CIRCLE_WORKFLOW_ID:0:7}
 
 
+    deploy-capston-app:
+      executor: aws-eks/python3
+      steps:
+        - checkout
+        - kubernetes/install
+        - aws-eks/update-kubeconfig-with-authenticator:
+            cluster-name: udacity-capstone-project
+            install-kubectl: true
+        - kubernetes/create-or-update-resource:
+            resource-file-path: deployment.yml
+            resource-name: deployment/udacity-devops-capstone
+            get-rollout-status: true            
+
+
   deploy-EKS-cluster:
     machine: 
           image: ubuntu-2004:202111-01
@@ -192,17 +206,11 @@ jobs:
             kubectl get nodes
             echo "<-- CLUSTER PODS --> "
             kubectl get pods --all-namespaces
-      - run:
-          name: Delete Blue deployment
-          command: |
-            curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/v0.83.0/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
-            sudo mv /tmp/eksctl /usr/local/bin
-            eksctl delete cluster --name prod-blue
 
 workflows:
   Default:
     jobs:
-      - deploy-EKS-cluster:
+      - deploy-capston-app:
           context: 
             - docker-secrets
             - aws-cred

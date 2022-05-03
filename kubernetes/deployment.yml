@@ -20,7 +20,7 @@ spec:
         app: udacity-devops-capstone
     spec:
       containers:
-        - image: vtm1983/udacity-devops-capstone:latest
+        - image: vtm1983/udacity-devops-capstone:udacity-devops-capstone
           name: udacity-devops-capstone
           imagePullPolicy: Always
           ports:
