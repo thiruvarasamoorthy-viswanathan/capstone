@@ -211,7 +211,7 @@ jobs:
 workflows:
   Default:
     jobs:
-      - deploy-capston-app:
+      - deploy-EKS-cluster:
           context: 
             - docker-secrets
             - aws-cred
