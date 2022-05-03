@@ -154,18 +154,18 @@ jobs:
             docker image push $DOCKERPATH:${CIRCLE_WORKFLOW_ID:0:7}
 
 
-    deploy-capston-app:
-      executor: aws-eks/python3
-      steps:
-        - checkout
-        - kubernetes/install
-        - aws-eks/update-kubeconfig-with-authenticator:
-            cluster-name: udacity-capstone-project
-            install-kubectl: true
-        - kubernetes/create-or-update-resource:
-            resource-file-path: deployment.yml
-            resource-name: deployment/udacity-devops-capstone
-            get-rollout-status: true            
+  deploy-capston-app:
+    executor: aws-eks/python3
+    steps:
+      - checkout
+      - kubernetes/install
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: udacity-capstone-project
+          install-kubectl: true
+      - kubernetes/create-or-update-resource:
+          resource-file-path: deployment.yml
+          resource-name: deployment/udacity-devops-capstone
+          get-rollout-status: true            
 
 
   deploy-EKS-cluster:
