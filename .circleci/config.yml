@@ -115,15 +115,15 @@ jobs:
       - run:
           name: Create eks-cluster
           command: |     
-            #eksctl create cluster \
-            #--name capstone-project-eks \
-            #--region us-west-2 \
-            #--nodegroup-name worker-node \
-            #--node-type t3.micro \
-            #--nodes 2 \
-            #--nodes-min 1 \
-            #--nodes-max 2  
-            #--dry-run             
+            eksctl create cluster \
+            --name capstone-project-eks \
+            --region us-west-2 \
+            --nodegroup-name worker-node \
+            --node-type t3.micro \
+            --nodes 2 \
+            --nodes-min 1 \
+            --nodes-max 2  
+            --dry-run             
       - run:
           name: Deploy To eks-cluster
           command: |
@@ -142,7 +142,7 @@ jobs:
             kubectl get pods --all-namespaces            
 
 
-  testing-cluster:
+  testing-eks-app:
     executor: aws-eks/python3
     
     steps:
@@ -160,7 +160,7 @@ jobs:
             kubectl get nodes
             kubectl get deployment
             kubectl get pod
-            curl "http://a7f070a87060d449e9a26368929d3526-1292348691.us-west-2.elb.amazonaws.com/"
+            curl "http://<external-ip>:<port>"
 
   rolling-deployment:
     executor: aws-eks/python3
@@ -184,16 +184,10 @@ jobs:
 workflows:
   Default:
     jobs:
-      - linting
-      - docker-build-push:
-          requires: [linting]
-          context: 
-            - docker-secrets     
-      - deploy-app-to-eks:
-          requires: [docker-build-push]
-          context: 
-            - docker-secrets
-            - aws-cred           
+      testing-eks-app:
+        context: 
+          - aws-cred        
+      
 
 
              
