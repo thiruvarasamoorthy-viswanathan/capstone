@@ -103,7 +103,7 @@ jobs:
     steps:
       - checkout
       - aws-cli/setup
-      - kubernetes/install-kubectl
+      - kubernetes/install
       - run:
           name: Install ekstcl
           command: |
