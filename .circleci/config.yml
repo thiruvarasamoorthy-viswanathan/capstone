@@ -122,13 +122,24 @@ jobs:
             # --node-type t3.micro \
             # --nodes 2 \
             # --nodes-min 1 \
-            # --nodes-max 2               
+            # --nodes-max 2  
+            # --dry-run             
       - run:
           name: Deploy To eks-cluster
           command: |
+            curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.21.2/2021-07-05/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin            
+
             aws eks --region us-west-2 update-kubeconfig --name capstone-project-eks
+            kubectl version --client
+            export KUBECONFIG=~/.kube/config
+
             kubectl apply -f k8files/service.yml
             kubectl apply -f k8files/deploy.yml
+            kubectl get svc
+            kubectl get nodes
+            kubectl get pods --all-namespaces            
 
 
   testing-cluster:
