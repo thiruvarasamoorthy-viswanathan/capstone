@@ -160,7 +160,7 @@ jobs:
             kubectl get nodes
             kubectl get deployment
             kubectl get pod
-            ./output.sh
+            curl "http://a7f070a87060d449e9a26368929d3526-1292348691.us-west-2.elb.amazonaws.com/"
 
   rolling-deployment:
     executor: aws-eks/python3
@@ -181,12 +181,7 @@ jobs:
 workflows:
   Default:
     jobs:
-      - deploy-app-to-eks:
-          context: 
-            - docker-secrets
-            - aws-cred
       - testing-cluster:
           context: 
             - aws-cred 
-          requires:
-            - deploy-app-to-eks                
+             
