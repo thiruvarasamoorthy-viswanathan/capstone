@@ -37,7 +37,7 @@ commands:
               aws --version
             fi
 jobs:
-  Lint:
+  linting:
     
     docker:
       - image: python:3.7.3-stretch
@@ -184,7 +184,6 @@ jobs:
 workflows:
   Default:
     jobs:
-      - rolling-deployment:
-          context: 
-            - aws-cred 
+      - linting
+
              
