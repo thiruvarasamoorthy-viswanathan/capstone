@@ -185,5 +185,9 @@ workflows:
   Default:
     jobs:
       - linting
+      - docker-build-push
+          requires: [linting]
+          context: docker-secrets      
+
 
              
