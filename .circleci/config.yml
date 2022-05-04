@@ -101,7 +101,7 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - aws-cli/setup
+      - linux-install-aws
       - k8s/install-kubectl
       - run:
           name: Install ekstcl
