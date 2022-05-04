@@ -163,7 +163,7 @@ jobs:
     executor: aws-eks/python3
     steps:
       - checkout
-      - kubernetes/install-kubectl
+      - kubernetes/install
       - aws-cli/setup
       - run:
           command: |
