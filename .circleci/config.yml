@@ -182,3 +182,8 @@ workflows:
           context: 
             - docker-secrets
             - aws-cred
+      - testing-cluster:
+          context: 
+            - aws-cred 
+          requires:
+            - deploy-app-to-eks                
