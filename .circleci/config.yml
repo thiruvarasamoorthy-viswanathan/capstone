@@ -170,18 +170,21 @@ jobs:
       - aws-cli/setup
       - run:
           command: |
+            curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.21.2/2021-07-05/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin             
             aws eks --region us-west-2 update-kubeconfig --name capstone-project-eks
             kubectl rollout restart deployment capstone-project
             kubectl get svc
             kubectl get nodes
             kubectl get deployment
             kubectl get pod
-            ./output.sh
+            curl "http://a7f070a87060d449e9a26368929d3526-1292348691.us-west-2.elb.amazonaws.com/"
 
 workflows:
   Default:
     jobs:
-      - testing-cluster:
+      - rolling-deployment:
           context: 
             - aws-cred 
              
