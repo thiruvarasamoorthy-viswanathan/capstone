@@ -10,6 +10,11 @@ spec:
   selector:
     matchLabels:
       app: capstone-project
+  template:
+    metadata:
+      labels:
+        app: capstone-project
+        version: v1      
     spec:
       containers:
         - name: capstone-project
