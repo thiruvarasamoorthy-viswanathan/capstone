@@ -184,9 +184,9 @@ jobs:
 workflows:
   Default:
     jobs:
-      testing-eks-app:
-        context: 
-          - aws-cred        
+      - testing-eks-app:
+          context: 
+            - aws-cred        
       
 
 
