@@ -135,8 +135,8 @@ jobs:
             kubectl version --client
             export KUBECONFIG=~/.kube/config
 
-            kubectl apply -f k8files/service.yml
-            kubectl apply -f k8files/deploy.yml
+            kubectl apply -f k8files/service.yml --validate=false
+            kubectl apply -f k8files/deploy.yml --validate=false
             kubectl get svc
             kubectl get nodes
             kubectl get pods --all-namespaces            
