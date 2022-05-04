@@ -127,7 +127,7 @@ jobs:
           name: Deploy To eks-cluster
           command: |
             aws eks --region us-west-2 update-kubeconfig --name capstone-project-eks
-            kubectl apply -f k8files/service.yml
+
             kubectl apply -f k8files/deploy.yml
 
 
