@@ -115,15 +115,15 @@ jobs:
       - run:
           name: Create eks-cluster
           command: |     
-            # eksctl create cluster \
-            # --name capstone-project-eks \
-            # --region us-west-2 \
-            # --nodegroup-name worker-node \
-            # --node-type t3.micro \
-            # --nodes 2 \
-            # --nodes-min 1 \
-            # --nodes-max 2  
-            # --dry-run             
+            #eksctl create cluster \
+            #--name capstone-project-eks \
+            #--region us-west-2 \
+            #--nodegroup-name worker-node \
+            #--node-type t3.micro \
+            #--nodes 2 \
+            #--nodes-min 1 \
+            #--nodes-max 2  
+            #--dry-run             
       - run:
           name: Deploy To eks-cluster
           command: |
@@ -187,7 +187,13 @@ workflows:
       - linting
       - docker-build-push:
           requires: [linting]
-          context: docker-secrets      
+          context: 
+            - docker-secrets     
+      - deploy-app-to-eks:
+          requires: [docker-build-push]
+          context: 
+            - docker-secrets
+            - aws-cred           
 
 
              
