@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   kubernetes: circleci/kubernetes@0.4.0 
   aws-eks: circleci/aws-eks@1.1.0
+  aws-cli: circleci/aws-cli@2.0.3
 
 commands: 
   linux-install-aws:
@@ -101,8 +102,8 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - linux-install-aws
-      - k8s/install-kubectl
+      - aws-cli/setup
+      - kubernetes/install-kubectl
       - run:
           name: Install ekstcl
           command: |
@@ -135,7 +136,7 @@ jobs:
     
     steps:
       - checkout
-      - k8s/install-kubectl
+      - kubernetes/install-kubectl
       - aws-cli/setup
       - run:
           name: test-deployment
@@ -151,7 +152,7 @@ jobs:
     executor: aws-eks/python3
     steps:
       - checkout
-      - k8s/install-kubectl
+      - kubernetes/install-kubectl
       - aws-cli/setup
       - run:
           command: |
