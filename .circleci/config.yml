@@ -209,6 +209,7 @@ workflows:
           context: 
             - aws-cred                   
       - rolling-deployment:
+          requires: [testing-eks-app]      
           context: 
             - aws-cred        
       
