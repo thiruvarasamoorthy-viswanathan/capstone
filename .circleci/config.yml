@@ -194,6 +194,20 @@ jobs:
 workflows:
   Default:
     jobs:
+      - linting
+      - docker-build-push:
+          requires: [linting]
+          context: 
+            - docker-secrets     
+      - deploy-app-to-eks:
+          requires: [docker-build-push]
+          context: 
+            - docker-secrets
+            - aws-cred
+      - testing-eks-app:   
+          requires: [deploy-app-to-eks]
+          context: 
+            - aws-cred                   
       - rolling-deployment:
           context: 
             - aws-cred        
