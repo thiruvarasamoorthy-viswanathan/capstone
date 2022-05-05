@@ -16,12 +16,12 @@ In this project, below are the learning objectives achieved:
 
 - Below are the various links:
 
-GIT: https://github.com/thiruvarasamoorthy-viswanathan/capstone
-CircleCI : https://app.circleci.com/pipelines/github/thiruvarasamoorthy-viswanathan/capstone?filter=all
-Doker Hub: https://hub.docker.com/repository/docker/vtm1983/udacity-devops-capstone/tags?page=1&ordering=last_updated
-Application LB link: http://a7f070a87060d449e9a26368929d3526-1292348691.us-west-2.elb.amazonaws.com/ (Please note the link will be available for few hours as its deplyed in Udacity account and ec2 instance shutdown in couple of hours. Screenshots attached of the link)
+1. GIT: https://github.com/thiruvarasamoorthy-viswanathan/capstone
+2. CircleCI : https://app.circleci.com/pipelines/github/thiruvarasamoorthy-viswanathan/capstone?filter=all
+3. Doker Hub: https://hub.docker.com/repository/docker/vtm1983/udacity-devops-capstone/tags?page=1&ordering=last_updated
+4. Application Load Balancer link: http://a7f070a87060d449e9a26368929d3526-1292348691.us-west-2.elb.amazonaws.com/ (Please note the link will be available for few hours as its deplyed in Udacity account and ec2 instance shutdown in couple of hours. Screenshots attached of the link)
 
--  screenshots in PNG format, named using the screenshot number listed in the instructions. These screenshots are included in your code repository in the root folder.
+-  screenshots in PNG format, named using the screenshot number listed as below. These screenshots are included in code repository in the root folder.
 <br/><br/>
 ## WORK FLOW
 
