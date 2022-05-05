@@ -160,7 +160,8 @@ jobs:
             kubectl get nodes
             kubectl get deployment
             kubectl get pod
-            curl "http://<external-ip>:<port>"
+            echo loadbalancer=`kubectl get svc -o jsonpath='{ $.items[*].status.loadBalancer}' | cut -b 26-96`
+            curl "http://$loadbalancer/""
 
   rolling-deployment:
     executor: aws-eks/python3
