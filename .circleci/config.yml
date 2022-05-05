@@ -182,6 +182,8 @@ jobs:
             kubectl get deployment
             kubectl get pod
             echo Testing App after rolling deployment
+            export loadbalancer=`kubectl get svc -o jsonpath='{ $.items[*].status.loadBalancer}' | cut -b 26-68`
+            echo $loadbalancer            
             curl "http://$loadbalancer.us-west-2.elb.amazonaws.com/"
 
 workflows:
