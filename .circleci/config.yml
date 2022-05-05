@@ -181,12 +181,13 @@ jobs:
             kubectl get nodes
             kubectl get deployment
             kubectl get pod
-            curl "http://a7f070a87060d449e9a26368929d3526-1292348691.us-west-2.elb.amazonaws.com/"
+            echo Testing App after rolling deployment
+            curl "http://$loadbalancer.us-west-2.elb.amazonaws.com/"
 
 workflows:
   Default:
     jobs:
-      - testing-eks-app:
+      - rolling-deployment:
           context: 
             - aws-cred        
       
